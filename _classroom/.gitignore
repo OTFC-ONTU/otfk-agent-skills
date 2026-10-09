@@ -1,0 +1,10 @@
+credentials.json
+token.json
+__pycache__/
+.deps/
+reviews/
+plans/*.json
+plans/*.txt
+plans/*.png
+plans/*.md
+!plans/examples/

@@ -1,0 +1,22 @@
+# Робоча папка викладача: у git потрапляє лише інструментарій.
+# Папки дисциплін, відомості, роботи студентів тощо, покладені поруч, ігноруються.
+/*
+!/.gitignore
+!/AGENTS.md
+!/CLAUDE.md
+!/README.md
+!/LICENSE
+!/LICENSE-MIT
+!/LICENSE-CC-BY-4.0
+!/skills/
+!/templates/
+!/_classroom/
+!/_context/
+!/install/
+
+# службове
+**/__pycache__/
+**/.DS_Store
+**/Thumbs.db
+**/~$*
+**/.~lock.*#

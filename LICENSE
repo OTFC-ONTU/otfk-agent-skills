@@ -1,0 +1,9 @@
+This repository uses two licenses:
+
+1. Code (everything under _classroom/ and install/, and any other script):
+   MIT License – see LICENSE-MIT.
+
+2. Teaching materials, rules and templates (AGENTS.md, CLAUDE.md, README.md,
+   skills/, templates/, _context/):
+   Creative Commons Attribution 4.0 International (CC BY 4.0) – see LICENSE-CC-BY-4.0.
+   Attribution: ВСП «Одеський технічний фаховий коледж ОНТУ», автори скілів.

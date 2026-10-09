@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Перевірка робіт</title>
+<style>
+:root{
+  --bg:#f4f6f9;--surface:#fff;--surface2:#f8fafc;--text:#17212e;--muted:#5d6b7c;--line:#dde3ea;
+  --accent:#1f5fa8;--accent-soft:#e6eef8;
+  --g5:#d9f2e0;--g5t:#1d6b37;--g4:#e2ecfa;--g4t:#1f4f8f;--g3:#fff1cc;--g3t:#7a5600;--g2:#fbdcdc;--g2t:#9b1c1c;
+  --down:#b42318;--up:#127a3c;--warn:#fff4e5;--warnline:#f2c27b;
+  --shadow:0 1px 2px rgba(16,24,40,.06);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f141b;--surface:#171e27;--surface2:#1c2530;--text:#e6ebf1;--muted:#97a3b3;--line:#2b3644;
+  --accent:#7fb0ef;--accent-soft:#1d2c3f;
+  --g5:#183a25;--g5t:#8fe0a9;--g4:#1b2d45;--g4t:#9cc3f5;--g3:#3d3214;--g3t:#f3d27a;--g2:#43201f;--g2t:#f5a3a3;
+  --down:#ff8a80;--up:#7fdc9c;--warn:#2e2614;--warnline:#7a5c22;--shadow:none;}}
+:root[data-theme="dark"]{
+  --bg:#0f141b;--surface:#171e27;--surface2:#1c2530;--text:#e6ebf1;--muted:#97a3b3;--line:#2b3644;
+  --accent:#7fb0ef;--accent-soft:#1d2c3f;
+  --g5:#183a25;--g5t:#8fe0a9;--g4:#1b2d45;--g4t:#9cc3f5;--g3:#3d3214;--g3t:#f3d27a;--g2:#43201f;--g2t:#f5a3a3;
+  --down:#ff8a80;--up:#7fdc9c;--warn:#2e2614;--warnline:#7a5c22;--shadow:none;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Arial,sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:24px;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 16px;font-size:14px}
+.note{background:var(--warn);border:1px solid var(--warnline);border-radius:8px;padding:10px 14px;font-size:13.5px;margin-bottom:16px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:8px 14px;font:inherit;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--accent);border-color:var(--accent);font-weight:600}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.filters input,.filters select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font:inherit}
+.checks{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:13.5px;color:var(--muted);margin-bottom:12px}
+.checks label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;min-width:120px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;font-size:14px}
+th{background:var(--surface2);font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:600;position:sticky;top:0;z-index:1;cursor:pointer;user-select:none}
+tr.row{cursor:pointer}
+tr.row:hover td{background:var(--surface2)}
+tr.open td{background:var(--accent-soft)}
+td.c{text-align:center;font-variant-numeric:tabular-nums}
+.who b{display:block}
+.who small{color:var(--muted)}
+.chip{display:inline-block;min-width:30px;text-align:center;border-radius:6px;padding:2px 7px;font-weight:700;font-variant-numeric:tabular-nums}
+.chip.g5{background:var(--g5);color:var(--g5t)}.chip.g4{background:var(--g4);color:var(--g4t)}
+.chip.g3{background:var(--g3);color:var(--g3t)}.chip.g2{background:var(--g2);color:var(--g2t)}
+.chip.none{color:var(--muted);font-weight:400}
+.alt{font-size:12px;color:var(--muted);display:block}
+.d-down{color:var(--down);font-weight:700}.d-up{color:var(--up);font-weight:700}.d-0{color:var(--muted)}
+.badge{display:inline-block;font-size:11.5px;border-radius:999px;padding:1px 8px;margin:1px 2px 1px 0;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.badge.manip{border-color:var(--down);color:var(--down);font-weight:600}
+.badge.plag{border-color:#c2410c;color:#c2410c}
+.badge.ai{border-color:#7c3aed;color:#7c3aed}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .badge.plag{color:#fdba74;border-color:#fdba74}:root:not([data-theme="light"]) .badge.ai{color:#c4b5fd;border-color:#c4b5fd}}
+input.final{width:58px;padding:5px;border:1px solid var(--line);border-radius:6px;text-align:center;background:var(--g3);color:var(--text);font:inherit;font-weight:600}
+input.final:placeholder-shown{background:var(--surface)}
+td.detail{background:var(--surface2);padding:16px 18px}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.box h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.box p{margin:0;white-space:pre-wrap}
+.box.full{grid-column:1/-1}
+.copy{float:right;font-size:12px;padding:3px 9px}
+details.md summary{cursor:pointer;color:var(--accent);font-weight:600}
+.mdbody table{border-radius:0;box-shadow:none;margin:8px 0}
+.mdbody td,.mdbody th{font-size:13px;vertical-align:top;position:static;text-transform:none;letter-spacing:0;cursor:default}
+.mdbody h1{font-size:18px}.mdbody h2{font-size:15px;margin:16px 0 6px}
+.mdbody code{background:var(--surface2);padding:1px 4px;border-radius:4px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow)}
+.card .t{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.card .w{font-weight:600;margin-bottom:4px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:8px}
+@media (max-width:820px){
+  .filters{grid-template-columns:1fr 1fr}.filters .q{grid-column:1/-1}
+  .dgrid{grid-template-columns:1fr}
+  thead{display:none}
+  table,tbody,tr,td{display:block;width:100%}
+  tr.row{border-bottom:1px solid var(--line);padding:8px 4px;display:grid;grid-template-columns:1fr auto auto;gap:4px 8px}
+  tr.row td{border:0;padding:2px 6px}
+  tr.row td.hide-m{display:none}
+}
+.noprev .pv{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="ttl"></h1>
+  <p class="sub" id="sub"></p>
+  <div class="note" id="note"></div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="works">Роботи</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="susp">Підозри</button>
+  </div>
+
+  <div class="filters">
+    <input class="q" id="q" type="search" placeholder="Пошук за ПІБ…" aria-label="Пошук за ПІБ">
+    <select id="fg" aria-label="Група"><option value="">Усі групи</option></select>
+    <select id="fs" aria-label="Предмет"><option value="">Усі предмети</option></select>
+    <select id="fw" aria-label="Робота"><option value="">Усі роботи</option></select>
+  </div>
+
+  <div id="worksView">
+    <div class="checks">
+      <label class="pv"><input type="checkbox" id="cDiff"> лише розбіжності з попередньою</label>
+      <label><input type="checkbox" id="cFlag"> лише з суттєвими підозрами</label>
+      <label><input type="checkbox" id="cLow"> <span id="lowLbl">лише низькі (2–3)</span></label>
+      <label><input type="checkbox" id="cOpen"> без остаточної оцінки</label>
+      <button class="btn" id="reset">Скинути фільтри</button>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="toolbar">
+      <button class="btn" id="fillMine">Заповнити порожні «Остаточні» рекомендованими (видимі рядки)</button>
+      <button class="btn" id="copyFinals">Скопіювати оцінки текстом</button>
+      <button class="btn primary" id="csv">Вивантажити CSV</button>
+    </div>
+    <div id="finalsBox" hidden style="margin-bottom:10px"><p style="margin:0 0 6px;font-size:13px;color:var(--muted)">Якщо файл не завантажився (вбудований браузер), скопіюйте цей текст і надішліть Claude:</p><textarea id="finalsTxt" readonly style="width:100%;height:140px;font:13px monospace;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text)"></textarea>
+    </div>
+    <table>
+      <thead><tr>
+        <th data-k="n">№</th><th data-k="st">Студент</th><th data-k="work">Робота</th><th data-k="at" class="hide-m">Здано</th>
+        <th data-k="prev" class="pv">Попер.</th><th data-k="g">Оцінка</th><th data-k="d" class="pv">Δ</th>
+        <th data-k="actual" class="hide-m">Факт. рівень</th><th class="hide-m">Позначки</th><th>Остаточна</th>
+      </tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+  </div>
+
+  <div id="suspView" hidden>
+    <div class="cards" id="cards"></div>
+  </div>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const rows = DATA.rows, susp = DATA.susp;
+const M = DATA.meta || {};
+const KEY = M.key || 'otfk-review';
+document.title = M.title || document.title;
+let finals = {};
+try { finals = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { finals = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(finals)); } catch (e) {} };
+const $ = s => document.querySelector(s);
+$('#ttl').textContent = M.title || 'Перевірка робіт';
+$('#sub').textContent = M.subtitle || '';
+$('#note').textContent = M.note || 'Це рекомендації: оцінки й коментарі в Classroom не змінювались. За підозри списування чи ШІ оцінки автоматично не знижувались. Колонка «Остаточна» – ваше рішення; зберігається в цьому браузері, можна вивантажити CSV.';
+if (!M.hasPrev) document.documentElement.classList.add('noprev');
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const MAX = (DATA.meta && DATA.meta.max) || 5;
+const cls = g0 => { if (g0 == null) return 'none'; const g = MAX === 12 ? (g0 >= 10 ? 5 : g0 >= 7 ? 4 : g0 >= 4 ? 3 : 2) : g0; return g >= 4.5 ? 'g5' : g >= 3.5 ? 'g4' : g >= 2.5 ? 'g3' : 'g2'; };
+const chip = g => `<span class="chip ${cls(g)}">${g == null ? '—' : String(g).replace('.', ',')}</span>`;
+rows.forEach(r => { r.d = (r.g == null || r.prev == null) ? null : Math.round((r.g - r.prev) * 10) / 10; });
+
+function fillSel(id, vals) { const s = $(id); [...new Set(vals)].sort().forEach(v => s.insertAdjacentHTML('beforeend', `<option>${esc(v)}</option>`)); }
+fillSel('#fg', rows.map(r => r.grp)); fillSel('#fs', rows.map(r => r.subj)); fillSel('#fw', rows.map(r => r.work));
+
+let sortK = 'n', sortDir = 1, openN = null;
+const norm = s => s.toLowerCase().replace(/[’'ʼ]/g, '');
+
+function filtered() {
+  const q = norm($('#q').value.trim()), g = $('#fg').value, s = $('#fs').value, w = $('#fw').value;
+  return rows.filter(r =>
+    (!q || norm(r.st).includes(q)) && (!g || r.grp === g) && (!s || r.subj === s) && (!w || r.work === w) &&
+    (!$('#cDiff').checked || (r.d !== null && r.d !== 0)) &&
+    (!$('#cFlag').checked || r.flags.length) &&
+    (!$('#cLow').checked || (r.g != null && (MAX === 12 ? r.g <= 6 : r.g <= 3))) &&
+    (!$('#cOpen').checked || finals[r.n] == null || finals[r.n] === ''));
+}
+
+function render() {
+  const list = filtered().sort((a, b) => {
+    let x = a[sortK], y = b[sortK];
+    if (x == null) x = -1; if (y == null) y = -1;
+    return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y), 'uk')) * sortDir;
+  });
+  const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2).replace('.', ',') : '—';
+  const mine = list.filter(r => r.g != null);
+  $('#stats').innerHTML = [
+    [list.length, 'робіт показано'],
+    ...(M.hasPrev ? [[avg(list.filter(r => r.prev != null).map(r => r.prev)), 'середня попередня']] : []),
+    [avg(mine.map(r => r.g)), M.hasPrev ? 'середня нова' : 'середня оцінка'],
+    ...(M.hasPrev ? [[mine.filter(r => r.d < 0).length + ' / ' + mine.filter(r => r.d > 0).length, 'нижче / вище']] : []),
+    [list.filter(r => r.flags.length).length, 'з підозрами'],
+    [list.filter(r => finals[r.n] != null && finals[r.n] !== '').length, 'остаточних заповнено'],
+  ].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+
+  if (!list.length) { $('#tb').innerHTML = '<tr><td colspan="10" class="empty">Нічого не знайдено</td></tr>'; return; }
+  $('#tb').innerHTML = list.map(r => {
+    const d = r.d == null ? '' : r.d === 0 ? '<span class="d-0">0</span>' : `<span class="${r.d < 0 ? 'd-down' : 'd-up'}">${r.d > 0 ? '+' : ''}${String(r.d).replace('.', ',')}</span>`;
+    const badges = [r.flags.includes('manip') && '<span class="badge manip">маніпуляція</span>', r.flags.includes('plag') && '<span class="badge plag">збіги</span>', r.flags.includes('ai') && '<span class="badge ai">ШІ</span>', r.late && '<span class="badge">запізн.</span>'].filter(Boolean).join('');
+    const main = `<tr class="row${openN === r.n ? ' open' : ''}" data-n="${r.n}">
+      <td class="c hide-m">${r.n}</td>
+      <td class="who"><b>${esc(r.st)}</b><small>${esc(r.subj)} ${esc(r.grp)}</small></td>
+      <td>${esc(r.work)}</td>
+      <td class="hide-m">${esc(r.at)}</td>
+      <td class="c pv">${chip(r.prev)}</td>
+      <td class="c">${chip(r.g)}${r.alt != null ? `<span class="alt">альт. ${String(r.alt).replace('.', ',')}</span>` : ''}</td>
+      <td class="c pv">${d}</td>
+      <td class="hide-m">${esc(r.actual)}</td>
+      <td class="hide-m">${badges}</td>
+      <td class="c"><input class="final" data-n="${r.n}" inputmode="decimal" placeholder="–" value="${esc(finals[r.n] ?? '')}" aria-label="Остаточна оцінка"></td></tr>`;
+    if (openN !== r.n) return main;
+    const box = (t, v, extra = '') => v ? `<div class="box ${extra}"><h4>${t}</h4><p>${esc(v)}</p></div>` : '';
+    return main + `<tr><td colspan="10" class="detail"><div class="dgrid">
+      <div class="box full"><h4>Коментар студенту <button class="btn copy" data-copy="${r.n}">Копіювати</button></h4><p>${esc(r.comment || '— (коментар не потрібен)')}</p></div>
+      ${(r.files && r.files.length) ? `<div class="box full"><h4>Файли роботи</h4><p>${r.files.map(f => `<a href="${esc(f.split('/').map(encodeURIComponent).join('/'))}" target="_blank" rel="noopener">${esc(f.split('/').pop())}</a>`).join(' · ')}</p></div>` : ''}
+      ${box('Розбір завдань', r.tasks)}
+      ${box('Для викладача', r.notes)}
+      ${box('Ознаки ШІ', r.ai)}
+      ${box('Списування / збіги', r.plag)}
+      ${box('Спроба маніпуляції', r.manip, 'full')}
+      ${box('Не перевірено', r.nc)}
+      <div class="box">${'<h4>Дані</h4><p>'}Заявлений рівень: ${esc(r.claimed || '—')}\nФактичний: ${esc(r.actual)}\nВпевненість: ${esc(r.conf)}\nЗдано: ${esc(r.at)}${r.late ? ' (із запізненням)' : ''}</p></div>
+      ${r.full ? `<div class="box full"><details class="md"><summary>Повний відгук</summary><div class="mdbody">${r.full}</div></details></div>` : ''}
+    </div></td></tr>`;
+  }).join('');
+}
+
+function renderSusp() {
+  const q = norm($('#q').value.trim()), s = $('#fs').value, w = $('#fw').value, g = $('#fg').value;
+  const grpOf = name => rows.filter(r => r.st === name).map(r => r.grp);
+  const list = susp.filter(x => (!q || x.who.some(n => norm(n).includes(q))) && (!s || x.subj === s) && (!w || x.work.includes(w)) && (!g || x.who.some(n => grpOf(n).includes(g))));
+  $('#cards').innerHTML = list.length ? list.map(x => `<div class="card"><div class="t"><span>${esc(x.type)} · ${esc(x.subj)} ${esc(x.work)}</span><span>${esc(x.power)}</span></div><div class="w">${x.who.map(esc).join(' ↔ ')}</div><div>${esc(x.what)}</div></div>`).join('') : '<div class="empty">Нічого не знайдено</div>';
+}
+
+const refresh = () => { render(); renderSusp(); };
+['#q', '#fg', '#fs', '#fw', '#cDiff', '#cFlag', '#cLow', '#cOpen'].forEach(id => $(id).addEventListener('input', refresh));
+$('#reset').onclick = () => { $('#q').value = ''; ['#fg', '#fs', '#fw'].forEach(i => $(i).value = ''); ['#cDiff', '#cFlag', '#cLow', '#cOpen'].forEach(i => $(i).checked = false); refresh(); };
+document.querySelectorAll('th[data-k]').forEach(th => th.onclick = () => { const k = th.dataset.k; sortDir = sortK === k ? -sortDir : 1; sortK = k; render(); });
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+  $('#worksView').hidden = t.dataset.tab !== 'works'; $('#suspView').hidden = t.dataset.tab !== 'susp';
+});
+$('#tb').addEventListener('click', e => {
+  if (e.target.matches('input.final')) return;
+  const c = e.target.closest('[data-copy]');
+  if (c) { e.stopPropagation(); const r = rows.find(r => r.n == c.dataset.copy);
+    (navigator.clipboard ? navigator.clipboard.writeText(r.comment) : Promise.reject()).then(() => { c.textContent = 'Скопійовано'; setTimeout(() => c.textContent = 'Копіювати', 1500); }).catch(() => { c.textContent = 'Не вдалося'; });
+    return; }
+  if (e.target.closest('.detail')) return;
+  const tr = e.target.closest('tr.row'); if (!tr) return;
+  openN = openN === +tr.dataset.n ? null : +tr.dataset.n; render();
+});
+$('#tb').addEventListener('change', e => {
+  if (!e.target.matches('input.final')) return;
+  let v = e.target.value.trim().replace(',', '.');
+  if (v === '') { delete finals[e.target.dataset.n]; }
+  else { const x = parseFloat(v); if (isNaN(x) || x < 1 || x > MAX) { e.target.value = finals[e.target.dataset.n] ?? ''; alertBox(); return; } finals[e.target.dataset.n] = x; e.target.value = String(x).replace('.', ','); }
+  save(); render();
+});
+function alertBox() { const s = $('#stats'); s.insertAdjacentHTML('afterbegin', '<div class="stat" style="border-color:var(--down)"><b>!</b><span>Оцінка від 1 до ' + MAX + '</span></div>'); setTimeout(render, 1800); }
+$('#fillMine').onclick = () => { filtered().forEach(r => { if ((finals[r.n] == null || finals[r.n] === '') && r.g != null) finals[r.n] = r.g; }); save(); render(); };
+$('#copyFinals').onclick = () => {
+  const lines = rows.filter(r => finals[r.n] != null && finals[r.n] !== '').map(r => `${r.n}; ${r.grp}; ${r.subj} ${r.work}; ${r.st}; ${String(finals[r.n]).replace('.', ',')}`);
+  const txt = lines.length ? 'Остаточні оцінки (' + lines.length + '):\n' + lines.join('\n') : 'Остаточні оцінки ще не заповнені';
+  $('#finalsBox').hidden = false; $('#finalsTxt').value = txt; $('#finalsTxt').select();
+  try { navigator.clipboard && navigator.clipboard.writeText(txt).then(() => { $('#copyFinals').textContent = 'Скопійовано'; setTimeout(() => $('#copyFinals').textContent = 'Скопіювати оцінки текстом', 1500); }).catch(() => {}); } catch (e) {}
+};
+$('#csv').onclick = () => {
+  const head = ['№', 'Група', 'Предмет', 'Робота', 'Студент', 'Попередня', 'Рекомендована', 'Альтернатива', 'Остаточна', 'Коментар студенту'];
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const lines = [head.map(q).join(';')].concat(rows.map(r => [r.n, r.grp, r.subj, r.work, r.st, r.prev, r.g, r.alt, finals[r.n], r.comment].map(v => q(typeof v === 'number' ? String(v).replace('.', ',') : v)).join(';')));
+  const blob = new Blob(['﻿' + lines.join('\r\n')], {type: 'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Остаточні оцінки – ' + (M.title || 'перевірка') + '.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+};
+refresh();
+</script>
+</body>
+</html>
